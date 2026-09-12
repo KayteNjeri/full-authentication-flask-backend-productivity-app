@@ -17,7 +17,7 @@ class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)
     date = fields.Date(required=True)
     duration_minutes = fields.Int(required=True,validate=validate.Range(min=1, max=1440))
-    notes = fields.Str(allow_none=True,validate=validate.Length(max=500))
+    notes = fields.Str(allow_none=True,validate=validate.Length(max=255))
     user_id = fields.Int(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
