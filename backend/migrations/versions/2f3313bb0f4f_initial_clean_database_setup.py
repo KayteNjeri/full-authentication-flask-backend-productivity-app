@@ -1,8 +1,8 @@
-"""Create users and workouts tables
+"""Initial clean database setup
 
-Revision ID: b553d58b4832
+Revision ID: 2f3313bb0f4f
 Revises: 
-Create Date: 2026-09-12 20:20:49.489666
+Create Date: 2026-09-12 21:31:18.934504
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b553d58b4832'
+revision = '2f3313bb0f4f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=80), nullable=False),
-    sa.Column('password', sa.String(length=120), nullable=False),
+    sa.Column('hashed_password', sa.String(length=120), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
