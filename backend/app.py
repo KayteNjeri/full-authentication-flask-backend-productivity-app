@@ -1,22 +1,36 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_migrate import Migrate
+from marshmallow import ValidationError
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from models import db
+from models import db, User, Workout
+from schemas import SignupSchema, LoginSchema, UserSchema, WorkoutSchema
 
+#initialize Flask App
 app = Flask(__name__)
 
+#Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #JWT configuration
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this to a secure key in production
 
+#Extensions
 db.init_app(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
+#Schemas
+signup_schema = SignupSchema()
+login_schema = LoginSchema()
+user_schema = UserSchema()
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)
+
+
+#Home route
 @app.route('/')
 def home():
     return {"message": "Welcome to the Workout Productivity API!"}
@@ -162,4 +176,4 @@ def delete_workout(workout_id):
     return {"message": "Workout deleted successfully"}, 200
 
 if __name__ == '__main__':
-    app.run(port=5555,debug=True)
+    app.run(port=5000,debug=True)
