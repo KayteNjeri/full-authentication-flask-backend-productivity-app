@@ -189,11 +189,13 @@ POST /signup
 
 Example request:
 
+```json
 {
   "username": "newuser",
   "password": "password123",
   "password_confirmation": "password123"
 }
+```
 
 Login
 
@@ -201,13 +203,16 @@ POST /login
 
 Example:
 
+```json
 {
   "username": "user1",
   "password": "password123"
 }
+```
 
 A successful login returns:
 
+```json
 {
   "user": {
     "id": 1,
@@ -215,6 +220,7 @@ A successful login returns:
   },
   "token": "JWT_TOKEN"
 }
+```
 
 Use the token on protected requests:
 
@@ -230,9 +236,11 @@ Authentication: Not required.
 
 Response:
 
+```json
 {
   "message": "Welcome to the Workout Productivity API!"
 }
+```
 
 # 📝 POST /signup
 
@@ -242,17 +250,21 @@ Authentication: Not required.
 
 Request body:
 
+```json
 {
   "username": "newuser",
   "password": "password123",
   "password_confirmation": "password123"
 }
+```
 
 Success: 201 Created
 
+```json
 {
   "message": "User created successfully"
 }
+```
 
 Possible errors:
 
@@ -270,6 +282,7 @@ Authentication: Not required.
 
 Success: 200 OK
 
+```json
 {
   "user": {
     "id": 1,
@@ -277,6 +290,7 @@ Success: 200 OK
   },
   "token": "JWT_TOKEN"
 }
+```
 
 Possible errors:
 
@@ -294,12 +308,14 @@ Authorization: Bearer JWT_TOKEN
 
 Example response:
 
+```json
 {
   "user": {
     "id": 1,
     "username": "user1"
   }
 }
+```
 
 # 🙋 GET /me
 
@@ -309,12 +325,14 @@ Authentication: JWT required.
 
 Example response:
 
+```json
 {
   "user": {
     "id": 1,
     "username": "user1"
   }
 }
+```
 
 ## 🏋️ Workout Endpoints
 
@@ -328,18 +346,19 @@ Returns the authenticated user's workouts.
 
 Supports pagination:
 
-/workouts?page=1&per_page=5
+`/workouts?page=1&per_page=5`
 
 Defaults:
 
-page=1
+`page=1`
 
-per_page=5
+`per_page=5`
 
-per_page maximum is 100
+`per_page maximum is 100`
 
 Response includes:
 
+```json
 {
   "workouts": [],
   "pagination": {
@@ -351,6 +370,7 @@ Response includes:
     "has_prev": false
   }
 }
+```
 
 # 🔎 GET /workouts/<workout_id>
 
@@ -363,9 +383,11 @@ Authorization: Bearer JWT_TOKEN
 
 If the workout does not exist or belongs to another user:
 
+```json
 {
   "message": "Workout not found"
 }
+```
 
 Status: 404 Not Found
 
@@ -375,29 +397,34 @@ Creates a workout for the authenticated user.
 
 Example request:
 
+```json
 {
   "date": "2026-09-13",
   "duration_minutes": 60,
   "notes": "Morning workout"
 }
+```
 
 Success: 201 Created
 
+```json
 {
   "message": "Workout created successfully"
 }
+```
 
 Validation rules:
 
-date is required
+`date is required`
 
-duration_minutes is required
+`duration_minutes is required`
 
-Duration must be between 1 and 1440 minutes
+`Duration must be between 1 and 1440 minutes`
 
-notes is optional
+`notes is optional`
 
-notes has a maximum length of 255 characters
+`notes has a maximum length of 255 characters`
+
 
 # ✏️ PATCH /workouts/<workout_id>
 
@@ -405,19 +432,23 @@ Updates one or more fields of an existing workout.
 
 Example:
 
-PATCH /workouts/1
-Authorization: Bearer JWT_TOKEN
+`PATCH /workouts/1`
+`Authorization: Bearer JWT_TOKEN`
 
+```json
 {
   "duration_minutes": 75,
   "notes": "Updated workout"
 }
+```
 
 Success: 200 OK
 
+```json
 {
   "message": "Workout updated successfully"
 }
+```
 
 # 🗑️ DELETE /workouts/<workout_id>
 
@@ -425,14 +456,16 @@ Deletes a workout belonging to the authenticated user.
 
 Example:
 
-DELETE /workouts/1
-Authorization: Bearer JWT_TOKEN
+`DELETE /workouts/1`
+`Authorization: Bearer JWT_TOKEN`
 
 Success: 200 OK
 
+```json
 {
   "message": "Workout deleted successfully"
 }
+```
 
 ## 📄 Pagination
 
@@ -492,7 +525,7 @@ with a `404` status code.
 
 ## 🧱 Database Models
 
-# User
+### User
 
 Fields:
 
@@ -503,7 +536,7 @@ Fields:
 
 Passwords are securely hashed using Flask-Bcrypt before being stored in the database.
 
-# Workout
+### Workout
 
 Fields:
 
@@ -521,13 +554,13 @@ Each workout belongs to one user, and a user can have multiple workouts.
 
 Marshmallow schemas validate incoming API data.
 
-# Signup
+### Signup
 
 * Username: required, 3--80 characters
 * Password: required, minimum 6 characters
 * Password confirmation: required
 
-# Workout
+### Workout
 
 * Date: required
 * Duration: required, 1--1440 minutes
@@ -539,7 +572,7 @@ The database also enforces a positive workout duration.
 
 Automated tests are located in the:
 
-backend/tests/
+`backend/tests/`
 
 Run all tests:
 
@@ -549,7 +582,7 @@ pipenv run pytest
 
 The test suite is intended to verify the Flask application's authentication, authorization, validation, and workout functionality.
 
-The API can be tested using Postman.
+The API can also be tested using Postman.
 
 ### 1️⃣ Register
 
@@ -627,6 +660,7 @@ Example request for creating a workout:
 
 The project uses Pipenv. The current Pipfile dependencies are:
 
+```json
 [[source]]
 url = "https://pypi.org/simple"
 verify_ssl = true
@@ -677,6 +711,7 @@ python_version = "3.12"
 [scripts]
 start = "python app.py"
 seed = "python seed.py"
+```
 
 Pipfile.lock stores the resolved dependency versions used by the project.
 
@@ -684,7 +719,7 @@ Pipfile.lock stores the resolved dependency versions used by the project.
 
 The application is deployed as a Flask Web Service on **Render**.
 
-# Production API
+### Production API
 
 ```text
 https://flask-backend-productivity-app.onrender.com
@@ -704,13 +739,13 @@ The repository also contains a frontend/ directory with the React client.
 
 The JWT frontend communicates with:
 
-POST /signup
-POST /login
-GET /me
+`POST /signup`
+`POST /login`
+`GET /me`
 
 The JWT token is sent with protected requests using:
 
-Authorization: Bearer JWT_TOKEN
+`Authorization: Bearer JWT_TOKEN`
 
 ## 📜 License
 
