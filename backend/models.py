@@ -3,9 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import validates
+from werkzeug.security import generate_password_hash, check_password_hash
 
+#Initialize ORM
 db = SQLAlchemy()
 
+#Define Tables/Relationships
 #user model
 class User(db.Model):
     __tablename__ = 'users'
@@ -15,13 +18,26 @@ class User(db.Model):
     hashed_password = db.Column(db.String(120), nullable=False)
     workouts = db.relationship("Workout", back_populates="user", cascade="all, delete-orphan")
 
+    #password management
+    #hash and store the user's password
+    def set_password(self, password):
+        self.hashed_password = generate_password_hash(password)
+
+    # check whether the given password is correct
+    def check_password(self, password):
+        return check_password_hash(self.hashed_password, password )
+
+    #Representation
     def __repr__(self):
         return f"<User {self.username}>"
+
+    #Dictionary Representation
     def to_dict(self):
         return {
             'id': self.id,
             'username': self.username,
         }
+    
 #Workout model
 class Workout(db.Model):
     __tablename__ = 'workouts'
@@ -35,9 +51,11 @@ class Workout(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
+    #Database constraints
     __table_args__ = (
         CheckConstraint('duration_minutes > 0', name='check_duration_positive'),)
 
+    #Duration validation
     @validates('duration_minutes')
     def validate_duration(self, key, value):
         if not isinstance(value, int) or value <= 0:
@@ -46,9 +64,11 @@ class Workout(db.Model):
             raise ValueError("The Duration cannot exceed 1440 minutes (24 hours).")
         return value
 
+    #Representation
     def __repr__(self):
         return f"<Workout {self.id} - {self.date}>"
-        
+
+    #Dictionary Representation
     def to_dict(self):
         return {
             'id': self.id,
