@@ -15,6 +15,9 @@ load_dotenv()
 #App config
 app = Flask(__name__)
 
+port = os.getenv("PORT", 5000)
+is_app_debug = os.getenv("APP_DEBUG", True)
+
 #Database configuration 
 db_url = os.getenv("DATABASE_URL", "sqlite:///app.db")
 if db_url.startswith("postgres://"):
@@ -239,4 +242,4 @@ def delete_workout(workout_id):
     return {"message": "Workout deleted successfully"}, 200
 
 if __name__ == '__main__':
-    app.run(port=5000,debug=True)
+    app.run(debug=is_app_debug, port=port)
