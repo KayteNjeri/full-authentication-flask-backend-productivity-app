@@ -1,28 +1,36 @@
 import os
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from marshmallow import ValidationError
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Workout
 from schemas import SignupSchema, LoginSchema, UserSchema, WorkoutSchema
+from dotenv import load_dotenv
 
+#load .env files in os
+load_dotenv()
 
-#instantiate Flask App
+#App config
 app = Flask(__name__)
 
 #Database configuration 
-db_url = os.getenv('DATABASE_URL', 'sqlite:///app.db')
+db_url = os.getenv("DATABASE_URL", "sqlite:///app.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://")
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 
-
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Token configs
+jwt_secret = os.getenv("JWT_SECRET_KEY")
+if not jwt_secret:
+    raise RuntimeError("CRITICAL: `JWT_SECRET_KEY` variable not set.")
 
 #JWT configuration
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # Change this to a secure key in production
+app.config["JWT_SECRET_KEY"] = jwt_secret 
 
 #Extensions
-db.init_app(app)
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 

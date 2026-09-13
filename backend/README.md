@@ -1,10 +1,10 @@
-# 🏋️ Flask Backend-Productivity Workout App
+# 🔐 Full Authentication Flask Backend-Productivity App
 
 ## 📖 Project Description
 
-The **Flask Backend-Productivity Workout App** is a Flask App that allows authenticated users to manage their personal workout records. Users can create accounts, log in securely using JWT authentication, and perform CRUD operations on their own workouts.
+The **Full Authentication Flask Backend-Productivity App** is a Flask App that allows authenticated users to manage their personal workout records. Users can create accounts, log in securely using JWT authentication, and perform CRUD operations on their own workouts. Passwords are securely hashed before being stored in the database.
 
-The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-Bcrypt, Flask-JWT-Extended, and Flask-Migrate**.
+The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-JWT-Extended, and Flask-Migrate**.
 
 ## ✨ Features
 
@@ -19,6 +19,7 @@ The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-Bcrypt, Flask-JWT-E
 * SQLite database
 * Database migrations with Flask-Migrate
 * API testing with Postman and pytest
+* Production-ready Gunicorn configuration
 
 ## 🛠️ Technologies Used
 
