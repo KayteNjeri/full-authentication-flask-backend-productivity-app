@@ -25,3 +25,7 @@ pytest = "==7.2.0"
 
 [requires]
 python_version = "3.12"
+
+[scripts]
+start = "python app.py"
+seed = "python seed.py"

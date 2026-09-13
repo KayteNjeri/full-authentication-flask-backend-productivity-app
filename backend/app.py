@@ -30,7 +30,7 @@ if not jwt_secret:
 app.config["JWT_SECRET_KEY"] = jwt_secret 
 
 #Extensions
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
