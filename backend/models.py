@@ -1,17 +1,20 @@
 from datetime import datetime, timezone
+
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import validates
-from werkzeug.security import generate_password_hash, check_password_hash
+
 
 #Initialize ORM
 db = SQLAlchemy()
+bcrypt = Bcrypt()
 
 #Define Tables/Relationships
 #user model
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -21,11 +24,11 @@ class User(db.Model):
     #password management
     #hash and store the user's password
     def set_password(self, password):
-        self.hashed_password = generate_password_hash(password)
+        self.hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
     # check whether the given password is correct
     def check_password(self, password):
-        return check_password_hash(self.hashed_password, password )
+        return bcrypt.check_password_hash(self.hashed_password,password)
 
     #Representation
     def __repr__(self):

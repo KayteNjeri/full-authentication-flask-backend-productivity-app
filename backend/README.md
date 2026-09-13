@@ -2,11 +2,13 @@
 
 ## 📖 Project Description
 
-The **Full Authentication Flask Backend-Productivity App** is a Flask App that allows authenticated users to manage their personal workout records. Users can create accounts, log in securely using JWT authentication, and perform CRUD operations on their own workouts. Passwords are securely hashed before being stored in the database.
+The **Full Authentication Flask Backend-Productivity App** is a REST API built with Python, Flask, Flask-SQLAlchemy, Marshmallow, Flask-JWT-Extended, and SQLite, with PostgreSQL support for production
+deployments.
 
-The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-JWT-Extended, and Flask-Migrate**.
+The application provides secure user authentication and a workout productivity system. Users can create accounts, log in to receive a JWT access token, view their profile, and create, read, update, and delete
+their own workout records.
 
-## ✨ Features
+## ✨ Main Features
 
 * JWT-based authentication
 * User registration and login
@@ -19,7 +21,16 @@ The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-JWT-Extended, and F
 * SQLite database
 * Database migrations with Flask-Migrate
 * API testing with Postman and pytest
-* Production-ready Gunicorn configuration
+* Render deployment
+* React frontend included in the repository
+
+## 🌐 Live API
+
+The deployed API is available at:
+
+```
+https://flask-backend-productivity-app.onrender.com
+```
 
 ## 🛠️ Technologies Used
 
@@ -31,8 +42,10 @@ The API uses **Flask, SQLAlchemy, SQLite, Marshmallow, Flask-JWT-Extended, and F
 * Flask-Bcrypt
 * Marshmallow
 * SQLite
+* PostgreSQL support with psycopg2-binary
 * Pytest
 * Gunicorn
+* Render
 
 ## 📁 Project Structure
 
@@ -46,7 +59,10 @@ full-authentication-flask-backend-productivity-app/
 │   ├── seed.py
 │   ├── Pipfile
 │   ├── Pipfile.lock
+|   ├── Procfile
 │   ├── README.md
+|   ├── requirements.txt
+|   ├── .env
 │   ├── .gitignore
 │   │
 │   ├── instance/
@@ -84,6 +100,12 @@ Navigate to the backend directory:
 cd backend
 ```
 
+Install Pipenv:
+
+```bash
+pip install pipenv
+```
+
 Install the Python dependencies:
 
 ```bash
@@ -96,9 +118,15 @@ Activate the virtual environment:
 pipenv shell
 ```
 
+Verify Python version:
+
+```bash
+python --version
+```
+
 ## 🗄️ Set up the Database
 
-Initialize the database migrations:
+With the Pipenv shell active, Initialize the database migrations:
 
 ```bash
 flask db init
@@ -121,22 +149,31 @@ flask db upgrade
 Run:
 
 ```bash
-python seed.py
+pipenv run seed
 ```
 
-The seed script creates sample users and workout records.
+The seed script creates sample users:
 
-⚠️ **Note:** The seed script uses `db.drop_all()` before recreating the database. Running it will delete existing database data.
+```bash
+user1    password123
+user2    password246
+user3    password369
+```
+
+It also creates sample workouts for the three users.
+
+⚠️ **Note:** The seed script clears existing users and workouts before inserting sample data. Running it will delete existing database data.
 
 ## ▶️ Running the Backend Application
 
 From the `backend/` directory, start the Flask development server:
 
 ```bash
-python app.py
+pipenv shell
+pipenv run start
 ```
 
-The API will be available at:
+The local API will be available at:
 
 ```text
 http://127.0.0.1:5000
@@ -146,31 +183,256 @@ http://127.0.0.1:5000
 
 The API uses **JWT (JSON Web Tokens)** for authentication.
 
-After logging in successfully, the API returns an `access_token`.
+Signup
 
-For protected endpoints, include the token in the request header:
+POST /signup
 
-```text
-Authorization: Bearer <JWT_TOKEN>
-```
+Example request:
 
-## 🔑 Authentication Endpoints
+{
+  "username": "newuser",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
 
-| Method  | Endpoint  | Description                                   |
-| ------- | --------- | --------------------------------------------- |
-| 🟢 POST | `/signup` | Register a new user                           |
-| 🟢 POST | `/login`  | Log in and receive a JWT                      |
-| 🔵 GET  | `/self`   | Retrieve the authenticated user's information |
+Login
+
+POST /login
+
+Example:
+
+{
+  "username": "user1",
+  "password": "password123"
+}
+
+A successful login returns:
+
+{
+  "user": {
+    "id": 1,
+    "username": "user1"
+  },
+  "token": "JWT_TOKEN"
+}
+
+Use the token on protected requests:
+
+Authorization: Bearer JWT_TOKEN
+
+## 🔑 API Endpoints
+
+# 🏠 GET /
+
+Returns a welcome message confirming that the API is running.
+
+Authentication: Not required.
+
+Response:
+
+{
+  "message": "Welcome to the Workout Productivity API!"
+}
+
+# 📝 POST /signup
+
+Creates a new user account.
+
+Authentication: Not required.
+
+Request body:
+
+{
+  "username": "newuser",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+
+Success: 201 Created
+
+{
+  "message": "User created successfully"
+}
+
+Possible errors:
+
+400 -- Passwords do not match
+
+409 -- Username already exists
+
+422 -- Required fields are missing
+
+# 🔐 POST /login
+
+Authenticates a user and returns a JWT access token.
+
+Authentication: Not required.
+
+Success: 200 OK
+
+{
+  "user": {
+    "id": 1,
+    "username": "user1"
+  },
+  "token": "JWT_TOKEN"
+}
+
+Possible errors:
+
+403 -- Invalid credentials
+
+422 -- Username or password is missing
+
+# 👤 GET /profile
+
+Returns the profile of the authenticated user.
+
+Authentication: JWT required.
+
+Authorization: Bearer JWT_TOKEN
+
+Example response:
+
+{
+  "user": {
+    "id": 1,
+    "username": "user1"
+  }
+}
+
+# 🙋 GET /me
+
+Returns the currently authenticated user.
+
+Authentication: JWT required.
+
+Example response:
+
+{
+  "user": {
+    "id": 1,
+    "username": "user1"
+  }
+}
 
 ## 🏋️ Workout Endpoints
 
-| Method    | Endpoint                 | Description                                |
-| --------- | ------------------------ | ------------------------------------------ |
-| 🔵 GET    | `/workouts`              | Retrieve the authenticated user's workouts |
-| 🟢 POST   | `/workouts`              | Create a new workout                       |
-| 🔵 GET    | `/workouts/<workout_id>` | Retrieve a specific workout                |
-| 🟡 PATCH  | `/workouts/<workout_id>` | Update a workout                           |
-| 🔴 DELETE | `/workouts/<workout_id>` | Delete a workout                           |
+All workout endpoints require JWT authentication.
+
+A user can only access workouts belonging to their own account.
+
+# 📋 GET /workouts
+
+Returns the authenticated user's workouts.
+
+Supports pagination:
+
+/workouts?page=1&per_page=5
+
+Defaults:
+
+page=1
+
+per_page=5
+
+per_page maximum is 100
+
+Response includes:
+
+{
+  "workouts": [],
+  "pagination": {
+    "page": 1,
+    "per_page": 5,
+    "total_pages": 1,
+    "total_items": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+
+# 🔎 GET /workouts/<workout_id>
+
+Returns a specific workout belonging to the authenticated user.
+
+Example:
+
+GET /workouts/1
+Authorization: Bearer JWT_TOKEN
+
+If the workout does not exist or belongs to another user:
+
+{
+  "message": "Workout not found"
+}
+
+Status: 404 Not Found
+
+# ➕ POST /workouts
+
+Creates a workout for the authenticated user.
+
+Example request:
+
+{
+  "date": "2026-09-13",
+  "duration_minutes": 60,
+  "notes": "Morning workout"
+}
+
+Success: 201 Created
+
+{
+  "message": "Workout created successfully"
+}
+
+Validation rules:
+
+date is required
+
+duration_minutes is required
+
+Duration must be between 1 and 1440 minutes
+
+notes is optional
+
+notes has a maximum length of 255 characters
+
+# ✏️ PATCH /workouts/<workout_id>
+
+Updates one or more fields of an existing workout.
+
+Example:
+
+PATCH /workouts/1
+Authorization: Bearer JWT_TOKEN
+
+{
+  "duration_minutes": 75,
+  "notes": "Updated workout"
+}
+
+Success: 200 OK
+
+{
+  "message": "Workout updated successfully"
+}
+
+# 🗑️ DELETE /workouts/<workout_id>
+
+Deletes a workout belonging to the authenticated user.
+
+Example:
+
+DELETE /workouts/1
+Authorization: Bearer JWT_TOKEN
+
+Success: 200 OK
+
+{
+  "message": "Workout deleted successfully"
+}
 
 ## 📄 Pagination
 
@@ -204,7 +466,7 @@ Example response:
 }
 ```
 
-## 🔒 User Data Ownership
+## 🔒 Authorization and User Data Ownership
 
 Each workout belongs to the authenticated user through the `user_id` foreign key.
 
@@ -214,11 +476,8 @@ This prevents one user from accessing, updating, or deleting another user's work
 
 For example:
 
-```python
-Workout.query.filter_by(
-    id=workout_id,
-    user_id=user_id
-).first()
+```bash
+workout = db.session.scalar(db.select(Workout).where(Workout.id == workout_id,Workout.user_id == user_id))
 ```
 
 If a workout does not belong to the authenticated user, the API returns:
@@ -231,7 +490,64 @@ If a workout does not belong to the authenticated user, the API returns:
 
 with a `404` status code.
 
-## 🧪 Testing with Postman
+## 🧱 Database Models
+
+# User
+
+Fields:
+
+* id
+* username
+* hashed_password
+* relationship to workouts
+
+Passwords are securely hashed using Flask-Bcrypt before being stored in the database.
+
+# Workout
+
+Fields:
+
+* id
+* date
+* duration_minutes
+* notes
+* user_id
+* created_at
+* updated_at
+
+Each workout belongs to one user, and a user can have multiple workouts.
+
+## ✅ Validation
+
+Marshmallow schemas validate incoming API data.
+
+# Signup
+
+* Username: required, 3--80 characters
+* Password: required, minimum 6 characters
+* Password confirmation: required
+
+# Workout
+
+* Date: required
+* Duration: required, 1--1440 minutes
+* Notes: optional, maximum 255 characters
+
+The database also enforces a positive workout duration.
+
+## 🧪 Tests
+
+Automated tests are located in the:
+
+backend/tests/
+
+Run all tests:
+
+```bash
+pipenv run pytest
+```
+
+The test suite is intended to verify the Flask application's authentication, authorization, validation, and workout functionality.
 
 The API can be tested using Postman.
 
@@ -252,6 +568,11 @@ with:
   "password_confirmation": "password123"
 }
 ```
+
+Sample response will be:
+
+![alt text](image.png)
+
 
 ### 2️⃣ Login
 
@@ -302,78 +623,94 @@ Example request for creating a workout:
 }
 ```
 
-## 🌱 Seed Users
+## 📦 Pipfile
 
-The seed script creates the following users:
+The project uses Pipenv. The current Pipfile dependencies are:
 
-| Username | Hashed_Password      |
-| -------- | ------------- |
-| `user1`  | `$2b$12$6CHht.dwMI749dif0uw7qOqm4FCogm4l7ZngNbZFfIUa29W/HWWy6` |
-| `user2`  | `$2b$12$EKHgGlLjzqlQKBzLr9DWmu8rq2E75m81RkdAusQo6b/vIcHvQc0HC` |
-| `user3`  | `$2b$12$r5waUs/LTf0KAoWAu6gPxuCCW4q5lpe7HnGdnsw4.IzPvWn4E5a/2` |
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
 
-⚠️ These credentials are for development/testing only.
+[packages]
+alembic = "==1.20.0"
+aniso8601 = "==10.0.1"
+attrs = "==26.1.0"
+bcrypt = "==5.0.0"
+click = "==8.5.0"
+faker = "==15.3.2"
+flask = "==2.2.2"
+flask-bcrypt = "==1.0.1"
+flask-jwt-extended = "==4.7.4"
+flask-migrate = "==4.0.0"
+flask-restful = "==0.3.9"
+flask-sqlalchemy = "==3.0.3"
+greenlet = "==3.5.5"
+gunicorn = "==26.2.0"
+importlib-metadata = "==6.0.0"
+importlib-resources = "==5.10.0"
+iniconfig = "==2.3.0"
+itsdangerous = "==2.2.0"
+jinja2 = "==3.1.6"
+mako = "==1.4.1"
+markupsafe = "==3.0.3"
+marshmallow = "==3.20.1"
+packaging = "==26.3"
+pluggy = "==1.6.0"
+psycopg2-binary = "==2.9.13"
+pyjwt = "==2.14.0"
+pytest = "==7.2.0"
+python-dateutil = "==2.9.0.post0"
+python-dotenv = "==1.2.3"
+pytz = "==2026.3.post1"
+six = "==1.17.0"
+sqlalchemy = "==2.0.52"
+typing-extensions = "==4.16.0"
+werkzeug = "==2.2.2"
+zipp = "==4.1.0"
 
-## 🧰 Useful Commands
+[dev-packages]
 
-Install dependencies:
+[requires]
+python_version = "3.12"
 
-```bash
-pipenv install
-```
+[scripts]
+start = "python app.py"
+seed = "python seed.py"
 
-Activate environment:
-
-```bash
-pipenv shell
-```
-
-Create migration:
-
-```bash
-flask db migrate -m "Migration message"
-```
-
-Apply migration:
-
-```bash
-flask db upgrade
-```
-
-Seed database:
-
-```bash
-python seed.py
-```
-
-Run application:
-
-```bash
-python app.py
-```
-
-Run tests:
-
-```bash
-pytest
-```
+Pipfile.lock stores the resolved dependency versions used by the project.
 
 ## 🚀 Deployment
 
-The application can be deployed as a Flask Web Service on **Render**.
+The application is deployed as a Flask Web Service on **Render**.
 
-For production deployment:
+# Production API
 
-* Use Gunicorn as the application server.
-* Set `JWT_SECRET_KEY` as an environment variable.
-* Configure the service to bind to `0.0.0.0`.
-* Because this project uses SQLite, persistent storage must be configured if the SQLite database needs to survive deployments and restarts.
+```text
+https://flask-backend-productivity-app.onrender.com
+```
 
-Example start command:
+The production server uses Gunicorn:
 
 ```bash
 gunicorn app:app
 ```
+
+Production secrets such as JWT_SECRET_KEY should be configured as Render environment variables and not stored in the repository.
+
+## 🖥️ Frontend
+
+The repository also contains a frontend/ directory with the React client.
+
+The JWT frontend communicates with:
+
+POST /signup
+POST /login
+GET /me
+
+The JWT token is sent with protected requests using:
+
+Authorization: Bearer JWT_TOKEN
 
 ## 📜 License
 

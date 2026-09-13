@@ -4,8 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from marshmallow import ValidationError
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Workout
+from models import db, bcrypt, User, Workout
 from schemas import SignupSchema, LoginSchema, UserSchema, WorkoutSchema
 from dotenv import load_dotenv
 
@@ -34,6 +33,7 @@ app.config["JWT_SECRET_KEY"] = jwt_secret
 
 #Extensions
 db.init_app(app)
+bcrypt.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
@@ -212,7 +212,7 @@ def update_workout(workout_id):
     try:
         data = workout_schema.load(request.get_json() or {}, partial=True)
     except ValidationError as error:
-        return {"message": "Validation failed", "errors": error.messages}, 400
+        return {"message": "Missing data", "errors": error.messages}, 400
     
     #Update the workout's attributes with the provided data
     if 'date' in data:
